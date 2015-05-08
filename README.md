@@ -1,4 +1,6 @@
 <h3>Frontend Web Developer NanoDegree Udacity Project5</h3>
+<h4>GitHub Pages link:</h4>
+http://v-yussupov.github.io/up5-neighborhood-map/
 <h4>Edinburgh Neighborhood map</h4>
 <h4>Description:</h4>
 I really enjoyed travelling in Scotland with my wife and decided to refresh my memories and use Edinburgh as a location for Project 5. This is a map with some interesting places in Edinburgh. App gets information and photos from Foursquare API, and description and suggested links from Wikipedia. Places are categorized and each category has a list of related subcategories. User can filter places list by category/subcategory visibility and search place by its name.
