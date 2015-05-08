@@ -1,0 +1,27 @@
+#top-menu {
+  margin: 20px;
+  #categories-selection {
+    h4 {
+      text-transform: capitalize;
+      font-size: 1rem;
+    }
+    label {
+      text-transform: capitalize;
+    }
+    .ui.checkbox {
+      margin-right: 1.3rem;
+    }
+  }
+}
+
+#accordion {
+  margin-left: 15px;
+  display: none;
+  .item label {
+    display: inline-block;
+  }
+}
+
+#places-pagination {
+  text-align: center;
+}

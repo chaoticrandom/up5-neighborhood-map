@@ -1,0 +1,12 @@
+@mixin heading($margin-top) {
+  margin-top: $margin-top;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: $color-text;
+}
+
+@mixin absolutePos {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}

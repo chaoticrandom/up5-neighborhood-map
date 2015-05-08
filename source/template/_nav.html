@@ -1,0 +1,91 @@
+<div id="navigation">
+
+  <div id="top-menu" class="ui labeled icon menu">
+    <a id="categories-selection" class="ui dropdown green item">
+      <i class="checkmark box icon"></i>
+        Categories
+
+      <div class="menu">
+        <h4 class="ui green header">Show / hide categories</h4>
+        <!-- ko foreach:categories -->
+        <div class="item">
+          <i class="dropdown icon"></i>
+          <div class="ui checkbox">
+            <input type="checkbox"
+                  data-bind="toggleAndDelay: isVisible, click:$root.applyVisibility(), attr: { id: htmlId}">
+            <label data-bind="attr: { for: htmlId}, text: name"></label>
+          </div>
+          <!-- ko if: subcategories -->
+            <div class="menu" data-bind="foreach: subcategories">
+              <div class="item">
+                <img data-bind="attr: { src: icon}">
+                <div class="ui checkbox">
+                  <input type="checkbox"
+                        data-bind="toggleAndDelay: isVisible, click:$root.applyVisibility(), attr: { id: htmlId}, enable: $parent.isVisible">
+                  <label data-bind="attr: { for: htmlId}, text: name">
+                  </label>
+                </div>
+              </div>
+            </div>
+          <!-- /ko -->
+        </div>
+        <!-- /ko -->
+      </div>
+
+    </a>
+    <a id="places-selection" class="green item">
+    <i class="map icon"></i>
+    Places
+    </a>
+  </div>
+
+  <!-- mobile part -->
+
+  <div id="mobile-nav" class="ui icon buttons">
+    <div id="categories-selection-mobile" class="ui green button">
+      <i class="checkmark box icon"></i>
+    </div>
+    <div id="places-selection-mobile" class="ui green button">
+      <i class="map icon"></i>
+    </div>
+  </div>
+
+  <br>
+
+  <div id="accordion" class="ui fluid vertical accordion menu">
+
+  <!-- ko foreach:categories -->
+    <div class="item">
+      <div class="ui checkbox title">
+        <input type="checkbox"
+              data-bind="toggleAndDelay: isVisible, click:$root.applyVisibility(), attr: { id: name}">
+        <label data-bind="attr: { for: name}, text: name"></label>
+        <i class="dropdown icon"></i>
+      </div>
+
+      <!-- ko if: subcategories -->
+
+      <div class="content">
+        <div class="ui form">
+          <div class="grouped fields">
+            <!-- ko foreach: subcategories -->
+            <div class="field">
+              <div class="ui checkbox">
+                <input type="checkbox"
+                      data-bind="toggleAndDelay: isVisible, click:$root.applyVisibility(), attr: { id: name}, enable: $parent.isVisible">
+                <label data-bind="attr: { for: name}, text: name">
+                </label>
+              </div>
+              <img data-bind="attr: { src: icon}" width="20px" style="float: right">
+            </div>
+            <!-- /ko -->
+          </div>
+        </div>
+      </div>
+      <!-- /ko -->
+
+    </div>
+  <!-- /ko -->
+
+  </div>
+</div>

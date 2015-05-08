@@ -1,0 +1,38 @@
+<div id="places-list">
+  <div class="ui stacked segment">
+    <h4 class="ui green header">List of places</h4>
+    <div class="ui icon input">
+      <i class="search icon"></i>
+      <input id="places-filter" name="search" placeholder="Find place..." type="text" autocomplete="off"
+            data-bind="value: filter, valueUpdate: 'afterkeydown',
+                      event: { focus: filteredItems.select(1) }"/>
+      <div class="results"></div>
+    </div>
+    <div class="ui list">
+      <!-- ko foreach: filteredItems.pagedItems -->
+      <div class="item">
+      <div class="content">
+      <a class="header" data-bind="text: placeName, click: $root.selectPlaceFromUI"></a>
+      <div class="description"></div>
+      </div>
+      </div>
+    <!-- /ko -->
+    </div>
+    <div id="places-pagination">
+      <div class="ui pagination menu">
+        <a class="icon item" data-bind="css: {'disabled': !filteredItems.prev.enabled()}, click: filteredItems.prev">
+        <i class="left arrow icon"></i>
+        </a>
+        <!-- ko foreach: filteredItems.pages -->
+        <a class="item" data-bind="attr: {id: 'page-' + $data}, text: $data, click: $root.filteredItems.select, css:$root.filteredItems.activePage($data)">
+        </a>
+        <!-- /ko -->
+
+        <a class="icon item" data-bind="css: {'disabled': !filteredItems.next.enabled()}, click: filteredItems.next">
+        <i class="right arrow icon"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>

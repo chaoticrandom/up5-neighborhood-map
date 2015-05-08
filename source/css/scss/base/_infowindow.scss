@@ -1,0 +1,89 @@
+#infowindow {
+  display: none;
+  text-align: center;
+
+ .dividing.header {
+   /*display: none;*/
+   text-align: left !important;
+   text-transform: capitalize;
+  }
+
+  .error-message {
+    margin-top: 1.3rem;
+    text-align: left;
+    .header {
+      font-size: 1.05rem;
+      margin: 0;
+      color: $color-dark;
+    }
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  #start-message {
+    margin-top: 1.3rem;
+    text-align: left;
+    .header {
+      font-size: 1.05rem;
+      margin: 0;
+      color: $color-dark;
+    }
+    ul {
+      font-size: 1rem;
+    }
+  }
+
+  #fsCard {
+    .meta {
+      @include heading(5px);
+      span {
+        color: $color-main;
+        font-weight: normal;
+        font-style: oblique;
+      }
+    }
+    .description {
+      @include heading(5px);
+      span {
+        color: $color-main;
+        font-weight: normal;
+        font-style: oblique;
+      }
+    }
+    a {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+  }
+
+  #wiki {
+    .header.desc {
+      @include heading(0);
+    }
+
+    .header.links {
+      @include heading(10px);
+    }
+
+    .meta {
+      color: $color-green;
+    }
+    .description {
+      font-size: 0.9rem;
+      color: $black;
+      p {
+        text-align: justify;
+      }
+      a {
+        text-align: center;
+        font-weight: bold;
+        font-size: 1rem;
+      }
+    }
+    .item a {
+      font-size: 0.9rem;
+    }
+  }
+}
