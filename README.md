@@ -25,10 +25,11 @@ to check build mode: echo $NODE_ENV<br>
 4) http://www.knockmeout.net/2011/04/utility-functions-in-knockoutjs.html<br>
 5) http://tech.pro/tutorial/1235/handling-paged-datasets-in-knockoutjs<br>
 6) http://robertnyman.com/2008/10/09/explaining-javascript-scope-and-closures/<br>
-7) Google Maps APIv3 documentation<br>
-8) Foursquare API documentation<br>
-9) Wikipedia API documentation<br>
-10) Search results from google.com<br>
+7) KnockoutJS documentation<br>
+8) Google Maps APIv3 documentation<br>
+9) Foursquare API documentation<br>
+10) Wikipedia API documentation<br>
+11) Search results from google.com<br>
 <h4>Libraries used:</h4>
 1) Knockout JS http://knockoutjs.com/<br>
 2) JQuery http://jquery.com/<br>
