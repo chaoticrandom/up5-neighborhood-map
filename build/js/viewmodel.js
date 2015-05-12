@@ -228,11 +228,7 @@ $(function () {
 						google.maps.MapTypeId.SATELLITE
 					]
 				},
-				zoomControl: true,
-				zoomControlOptions: {
-					style: google.maps.ZoomControlStyle.SMALL,
-					position: google.maps.ControlPosition.RIGHT_TOP
-				},
+				zoomControl: false,
 				streetViewControl: true,
 				streetViewControlOptions: {
 					position: google.maps.ControlPosition.RIGHT_TOP
@@ -255,22 +251,141 @@ $(function () {
 				client_secret: '&client_secret=ORLCOGGR1WU53EI2DC0MLRBLKNJY5PVCJKIEKN5QKPC3P3I4',
 				version: '&v=20140806&m=foursquare'
 			},
+			viewport = ko.observable({
+				width: ko.observable(),
+				height: ko.observable()
+			}),
+			//function to calculate viewport sizes
+			calculateViewPort = function() {
+				viewport().width(Math.max(document.documentElement.clientWidth, window.innerWidth || 0));
+				viewport().height(Math.max(document.documentElement.clientHeight, window.innerHeight || 0));
+			},
+			//function to calculate offset in px from center
+			//to display infowindow based on viewport
+			infowindowOffset = function() {
+
+				var centerOffset = function(shiftX, shiftY) {
+					var scale = Math.pow(2, googlemap().getZoom());
+					var nw = new google.maps.LatLng(
+						googlemap().getBounds().getNorthEast().lat(),
+						googlemap().getBounds().getSouthWest().lng()
+					);
+					var worldCoordinateNW = googlemap().getProjection().fromLatLngToPoint(nw);
+					var worldCoordinate = googlemap().getProjection().fromLatLngToPoint(googlemap().getCenter());
+					//center of the screen coordinates in px
+					var pixelOffset = {
+						x: Math.floor((worldCoordinate.x - worldCoordinateNW.x) * scale),
+						y: Math.floor((worldCoordinate.y - worldCoordinateNW.y) * scale)
+					};
+					//offset from center, based on given coefficient
+					//on small viewports it is better to pan the map to the bottom of the screen
+					//instead of panning the map to its center position
+					var xPos = (viewport().width() - pixelOffset.x) * shiftX;
+					var yPos = (viewport().height() - pixelOffset.y) * shiftY;
+					return {x: xPos, y: yPos};
+				};
+				//offsets based on viewport and screen orientation
+				if (viewport().width() < viewport().height()) {
+					if (viewport().width() > 400) {
+						return centerOffset(0, -0.4);
+					}
+					else if (viewport().width() > 320) {
+						return centerOffset(0, -0.9);
+					}
+					else {
+						return centerOffset(0, -0.95);
+					}
+				}
+				else {
+					if (viewport().width() > 640) {
+						return centerOffset(0, -0.75);
+					}
+					else if (viewport().width() > 480) {
+						return centerOffset(0, -0.95);
+					}
+					else {
+						return centerOffset(0.2, -0.95);
+					}
+				}
+			},
 			//InfoBubble object is used as a replacement for standard Google infowindow object
-			infowindow = new InfoBubble({
-	      content: document.getElementById("infowindow"),
-	      shadowStyle: 1,
-				minWidth: 340,
-				maxWidth: 351,
-				minHeight: 350,
-				maxHeight: 470,
-	      padding: 10,
-				hideCloseButton: true,
-	      arrowSize: 10,
-	      borderWidth: 0,
-	      disableAutoPan: false,
-	      arrowPosition: 30,
-	      arrowStyle: 2
-    	}),
+			infowindow = ko.computed(function() {
+				var infoWindowOpts = {
+		      content: document.getElementById("infowindow"),
+		      shadowStyle: 1,
+					minWidth: 350,	//defaults
+					maxWidth: 351,
+					minHeight: 400,
+					maxHeight: 470,
+		      padding: 10,
+					hideCloseButton: true,
+		      arrowSize: 10,
+		      borderWidth: 0,
+		      disableAutoPan: true,
+		      arrowPosition: 50,
+		      arrowStyle: 2
+    		};
+				return new InfoBubble(infoWindowOpts);
+			}),
+			//infowindow size depends on viewoprt size and orientation
+			//infowindow sizes will be recalculated if viewport's size / orientation is changed
+			infowindowSize = ko.computed(function() {
+				var minWidth, maxWidth, minHeight, maxHeight, obj;
+				if (viewport().width() < viewport().height()) {
+					if (viewport().width() > 400) {
+						minWidth = 350;
+						maxWidth = 351;
+						minHeight = 400;
+						maxHeight = 470;
+					}
+					else if (viewport().width() > 320) {
+						minWidth = 350;
+						maxWidth = 351;
+						minHeight = 410;
+						maxHeight = 411;
+					}
+					else {
+						minWidth = 290;
+						maxWidth = 291;
+						minHeight = 250;
+						maxHeight = 251;
+					}
+				}
+				else {
+					if (viewport().width() > 640) {
+						minWidth = 350;
+						maxWidth = 351;
+						minHeight = 400;
+						maxHeight = 470;
+					}
+					else if (viewport().width() > 480) {
+						minWidth = 380;
+						maxWidth = 381;
+						minHeight = 260;
+						maxHeight = 261;
+					}
+					else {
+						minWidth = 320;
+						maxWidth = 321;
+						minHeight = 220;
+						maxHeight = 221;
+					}
+				}
+				obj = {
+					minWidth: minWidth,
+					maxWidth: maxWidth,
+					minHeight: minHeight,
+					maxHeight: maxHeight
+				};
+				return obj;
+			}),
+			//function to set infowindow's size
+			setInfowindowSize = ko.computed(function() {
+				infowindow().setMinWidth(infowindowSize().minWidth);
+				infowindow().setMaxWidth(infowindowSize().maxWidth);
+				infowindow().setMinHeight(infowindowSize().minHeight);
+				infowindow().setMaxHeight(infowindowSize().maxHeight);
+			}),
 			//computed google maps object
 			googlemap = ko.computed(function() {
 				var mapObject = new google.maps.Map(mapContainer, mapOptions);
@@ -279,10 +394,12 @@ $(function () {
 					var center = mapObject.getCenter();
 					google.maps.event.trigger(mapObject, "resize");
 					mapObject.setCenter(center);
+					infowindow().close(); //close infowindow on resize (orientation change)
+					calculateViewPort(); //recalculate viewport if resize event is triggered
 				});
 				//listener to hide UI elements if map was clicked
 				google.maps.event.addListener(mapObject, 'click', function() {
-					infowindow.close();
+					infowindow().close();
 					$('#places-selection').removeClass('active visible');
 					$( '#places-selection-mobile' ).removeClass('active visible');
 					$('#places-list').css("display", "none");
@@ -369,6 +486,21 @@ $(function () {
           return (subcategoryIdList.indexOf(p.subcategory().id()) > -1);
         }).sort(sortPlaces);
 			}),
+			//function to pan google map by (offsetx, offsety) from specified position
+			//it is used to pan the map from marker's position by calculated px offset
+			mapOffset = function(latlng,offsetx,offsety) {
+				var point1 = googlemap().getProjection().fromLatLngToPoint(
+					(latlng instanceof google.maps.LatLng) ? latlng : googlemap().getCenter()
+				);
+				var point2 = new google.maps.Point(
+					( (typeof(offsetx) == 'number' ? offsetx : 0) / Math.pow(2, googlemap().getZoom()) ) || 0,
+					( (typeof(offsety) == 'number' ? offsety : 0) / Math.pow(2, googlemap().getZoom()) ) || 0
+				);
+				googlemap().setCenter(googlemap().getProjection().fromPointToLatLng(new google.maps.Point(
+					point1.x - point2.x,
+					point1.y + point2.y
+				)));
+			},
 			//computed array of markers
 			markers = ko.pureComputed(function() {
 				var result = [];
@@ -381,9 +513,11 @@ $(function () {
 				var addListener = function(marker) {
 					google.maps.event.clearListeners(marker.markerObj(), 'click');
 					google.maps.event.addListener(marker.markerObj(), 'click', function() {
-						infowindow.open(googlemap(), marker.markerObj());
+						infowindow().open(googlemap(), marker.markerObj());
 						selectPlace(placeLookupObj()[marker.placeId()]);
 						googlemap().panTo(marker.markerObj().getPosition());
+						//offset map based on viewport size
+						mapOffset(marker.markerObj().getPosition(), infowindowOffset().x, infowindowOffset().y);
 					});
 				};
 
@@ -416,9 +550,10 @@ $(function () {
       },
 			//select place from UI, opens infowindow and controls UI behaviour
 			selectPlaceFromUI = function(p) {
-				infowindow.open(googlemap(), p.marker().markerObj());
+				infowindow().open(googlemap(), p.marker().markerObj());
 				selectPlace(p);
 				googlemap().panTo(p.marker().markerObj().getPosition());
+				mapOffset(p.marker().markerObj().getPosition(), infowindowOffset().x, infowindowOffset().y);
 				$('#places-selection').removeClass('active visible');
 				$( '#places-selection-mobile' ).removeClass('active visible');
 				$('#places-list').css("display", "none");
@@ -760,8 +895,13 @@ $(function () {
 
 				$('#infowindow').css('display', 'block');
 			};
+
 			return {
           metadata: metadata,
+					viewport: viewport,
+					calculateViewPort: calculateViewPort,
+					infowindowSize: infowindowSize,
+					infowindowOffset: infowindowOffset,
 					googlemap: googlemap,
 					infowindow: infowindow,
           places: places,
@@ -785,6 +925,7 @@ $(function () {
 	}();
 	//add listener once when google map is loaded
 	google.maps.event.addListenerOnce(up5.vm.googlemap(), 'tilesloaded', function(){
+		up5.vm.calculateViewPort(); //calculate initial viewport
 		up5.vm.loadPlaces(); //load initial data
 		ko.applyBindings(up5.vm);	//apply bindings
 		up5.vm.initUI();	//initialize UI
